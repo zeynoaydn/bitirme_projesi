@@ -39,8 +39,6 @@ class _PageToEditState extends State<PageToEdit> {
     }));
   }
   
-  
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
