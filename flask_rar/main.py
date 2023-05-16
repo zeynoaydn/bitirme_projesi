@@ -11,8 +11,6 @@ app.config["RESULT_FOLDER"]=RESULT_FOLDER
 
 #### Rotalar
 
-rota_ekle(api, MyController, '/deneme')
-rota_ekle(api, MyController2, '/deneme2')
 rota_ekle(api, ImageController, '/ImageEdit/<string:operation>')
 
 #### Rotalar
