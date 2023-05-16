@@ -3,17 +3,6 @@ from flask_restful import Resource
 from openCV_funcs import * 
 import os
 
-# class MyController(Resource):
-#     def get(self):
-#         return {'hello': 'world'}
-# #Ornek Controller1
-
-
-# class MyController2(Resource):
-#     def get(self):
-#         return {'cevap2':'cevap2'}
-# #Ornek Controller2
-
 class ImageController(Resource):
     def get(self,operation):
         file=request.files["dosya"]
@@ -61,8 +50,3 @@ class ImageController(Resource):
         #
         return send_file(file.filename,as_attachment=True)
         pass
-
-# class MyController3(Resource):
-#     def get(self,sayi):
-#         return {'cevap2':sayi}
-# #Ornek Controller2
