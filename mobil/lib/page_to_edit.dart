@@ -256,14 +256,29 @@ class _PageToEditState extends State<PageToEdit> {
       ],
     );
   }
-  
+
   Image myImage(String result, int key) {
     if (result == 'Resim Yok') {
       return Image.file(File(widget.image.path));
     }
     return Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
-      debugPrint('umutumutumutumut');
-      return Image.network(result, fit: BoxFit.contain, key: Key(key.toString()));
+      return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+        return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+          return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+            return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+              return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+                return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+                  return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+                    return  Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+                      return myImage('Resim Yok', 9999);
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
     },);
   }
 }
