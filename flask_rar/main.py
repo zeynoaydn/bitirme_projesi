@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, Api
 from controllers import *
-from route import rota_ekle
 
 app = Flask(__name__)
 api = Api(app)
@@ -11,7 +10,11 @@ app.config["RESULT_FOLDER"]=RESULT_FOLDER
 
 #### Rotalar
 
-rota_ekle(api, ImageController, '/ImageEdit/<string:operation>')
+api.add_resource(
+    ImageController, 
+    '/ImageEdit/<string:operation>',
+    '/getImage/<string:resim_adi>'
+)
 
 #### Rotalar
 

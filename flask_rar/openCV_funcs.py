@@ -3,15 +3,28 @@ import os
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 
-def convert_to_image_gray(image_path):
-    gray_image=cv2.imread(image_path,0)
+def rename_image(file_path, new_name):
+    directory = os.path.dirname(file_path)
+    new_path = os.path.join(directory, new_name)
+    os.rename(file_path, new_path)
+
+
+def rescale(image, image_path, token):
+    name = os.path.basename(image_path)
+    rename_image(name, token+name)
+    width = int(270)
+    height = int(390)
+    boyut = (width, height)
+    return cv2.resize(image, boyut, interpolation=cv2.INTER_AREA)
+
+def convert_to_image_gray(image_path, token):
+    gray_image=rescale(cv2.imread(image_path,0), image_path, token)
     name=image_path.split("/")[-1]
     cv2.imwrite(name,gray_image)
     os.remove(image_path)
 
-def applyPencilSketch(image_path, display=True):
-    image = cv2.imread(image_path)
-
+def applyPencilSketch(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     if image is None:
         print("Error: Failed to read image file")
         return None
@@ -25,15 +38,12 @@ def applyPencilSketch(image_path, display=True):
 
     if display:
         name = os.path.basename(image_path)
-        # cv2.imshow(name, color_sketch)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
         cv2.imwrite(name, color_sketch)
     else:
         return color_sketch
     
 def applyPencilSketch2(image_path, display=True):
-    image = cv2.imread(image_path)
+    image = rescale(cv2.imread(image_path), image_path, token)
 
     if image is None:
         print("Error: Failed to read image file")
@@ -54,7 +64,7 @@ def applyPencilSketch2(image_path, display=True):
         return gray_sketch
     
 def applyGotham(image_path, display=True):
-    image = cv2.imread(image_path)
+    image = rescale(cv2.imread(image_path), image_path, token)
     midtone_contrast_increase = UnivariateSpline(x=[0, 25, 51, 76, 102, 128, 153, 178, 204, 229, 255],
                                                  y=[0, 13, 25, 51, 76, 128, 178, 204, 229, 242, 255])(range(256))
 
@@ -78,8 +88,8 @@ def applyGotham(image_path, display=True):
     else:
         return output_image
     
-def applyWarm(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyWarm(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     blue_channel, green_channel, red_channel = cv2.split(image)
     
     increase_table = np.array([i+50 if i+50 < 255 else 255 for i in np.arange(0, 256)]).astype("uint8")
@@ -97,8 +107,8 @@ def applyWarm(image_path, display=True):
     else:
         return output_image
     
-def applyCold(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyCold(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     blue_channel, green_channel, red_channel = cv2.split(image)
     
     increase_table = np.array([i+15 if i+15<255 else 255 for i in np.arange(0,256)]).astype("uint8")
@@ -115,8 +125,8 @@ def applyCold(image_path, display=True):
     else:
         return output_image
     
-def applyGrayscale(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyGrayscale(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     output_image = cv2.merge((gray, gray, gray))
     if display:
@@ -126,8 +136,8 @@ def applyGrayscale(image_path, display=True):
     else:
         return output_image
     
-def applySepia(image_path, display=True):
-    image = cv2.imread(image_path)
+def applySepia(image_path, token, display=True,):
+    image = rescale(cv2.imread(image_path), image_path, token)
     image_float = np.float64(image)
     blue_channel, green_channel, red_channel = cv2.split(image_float)
     output_blue = (red_channel * .272) + (green_channel *.534) + (blue_channel * .131)
@@ -147,8 +157,8 @@ def applySepia(image_path, display=True):
     else:
         return output_image
     
-def applySharpening(image_path, display=True):
-    image = cv2.imread(image_path)
+def applySharpening(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     
     sharpening_kernel = np.array([[-1, -1, -1],
                                   [-1, 9.2, -1],
@@ -163,8 +173,8 @@ def applySharpening(image_path, display=True):
     else:
         return sharpened_image
     
-def applySharpening2(image_path, display=True):
-    image = cv2.imread(image_path)
+def applySharpening2(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     
     sharpening_kernel = np.array([[-1, -1, -1],
                                   [-1, 9.4, -1],
@@ -179,8 +189,8 @@ def applySharpening2(image_path, display=True):
     else:
         return sharpened_image
     
-def applyDetailEnhancing(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyDetailEnhancing(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     output_image = cv2.detailEnhance(image, sigma_s=15, sigma_r=0.15)
     if display:
         name = os.path.basename(image_path)
@@ -189,8 +199,8 @@ def applyDetailEnhancing(image_path, display=True):
     else:
         return output_image
     
-def applyStylization(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyStylization(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     output_image = cv2.stylization(image, sigma_s=15, sigma_r=0.55) 
     if display:
         name = os.path.basename(image_path)
@@ -199,8 +209,8 @@ def applyStylization(image_path, display=True):
     else:
         return output_image
     
-def applyInvert(image_path, display=True):
-    image = cv2.imread(image_path)
+def applyInvert(image_path, token, display=True):
+    image = rescale(cv2.imread(image_path), image_path, token)
     output_image = cv2.bitwise_not(image)
     if display:
         name = os.path.basename(image_path)
@@ -209,8 +219,8 @@ def applyInvert(image_path, display=True):
     else:
         return output_image
     
-def reverseReflection(image_path,display=True):
-    dog = cv2.imread(image_path)
+def reverseReflection(image_path, token, display=True):
+    dog = rescale(cv2.imread(image_path), image_path, token)
     
     
     if display:
@@ -220,65 +230,26 @@ def reverseReflection(image_path,display=True):
         os.remove(image_path)
     return reverse_flip
 
-def resizedImg(image_path,display=True):
-    image=cv2.imread(image_path)
+def resizedImg(image_path, token, display=True):
+    image=rescale(cv2.imread(image_path), image_path)
     img_resize=cv2.resize(image,(150,150))
     
     name = os.path.basename(image_path)
     cv2.imwrite(name, img_resize)
     os.remove(image_path)
 
-def horizontalStack(image_path,display=True):
-    img=cv2.imread(image_path)
+def horizontalStack(image_path, token, display=True):
+    img=rescale(cv2.imread(image_path), image_path)
     hor=np.hstack((img,img))
     
     name = os.path.basename(image_path)
     cv2.imwrite(name, hor)
     os.remove(image_path)
 
-def verticalStack(image_path,display=True):
-    img=cv2.imread(image_path)
+def verticalStack(image_path, token, display=True):
+    img=rescale(cv2.imread(image_path), image_path)
     ver=np.vstack((img,img))
 
     name = os.path.basename(image_path)
     cv2.imwrite(name, ver)
     os.remove(image_path)
-
-def blackToBlack(input_filename, output_filename=None, display_output=True):
-
-    image = cv2.imread(input_filename)
-
-    white_to_black_table = []
-    for i in range(256):
-        if i > 220:
-            white_to_black_table.append(0)
-        else:
-            white_to_black_table.append(i)
-
-    output_image = cv2.LUT(image, np.array(white_to_black_table).astype("uint8"))
-
-    if output_filename is not None:
-        cv2.imwrite(output_filename, output_image)
-
-    if display_output:
-        name = os.path.basename(input_filename)
-        cv2.imwrite(name, output_image)
-        os.remove(input_filename)
-    return output_image
-
-def whiteToWhite(image_file, display=True):
-    image = cv2.imread(image_file)
-    black_to_white_table = []
-    for i in range(256):
-        if i < 50:
-            black_to_white_table.append(255)
-        else:
-            black_to_white_table.append(i)
-    lut = np.array(black_to_white_table).astype("uint8")
-    output_image = cv2.LUT(image, lut)
-    if display:
-        name = os.path.basename(image_file)
-        output_filename = os.path.splitext(image_file)[0] + '_output.png'
-        cv2.imwrite(output_filename, output_image)
-        os.remove(image_file)
-    return output_image

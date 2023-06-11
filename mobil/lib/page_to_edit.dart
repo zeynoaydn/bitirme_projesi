@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -17,7 +18,28 @@ class PageToEdit extends StatefulWidget {
 
 class _PageToEditState extends State<PageToEdit> {
   bool loading = false;
+  String result = 'Resim Yok';
+  bool loading_umut = false;
+  int cakallik = 0;
 
+  Future<String> goApi(String operation) async {
+    
+    debugPrint('operation : '+operation);
+    
+    var dio = Dio();
+    var res = null;
+
+    File resim = File(widget.image.path);
+   
+    FormData formData = FormData.fromMap({
+      "dosya": await MultipartFile.fromFile(resim.path),
+    });
+
+    res = await dio.post('http://10.0.2.2:5000/ImageEdit/'+operation, data:formData);
+    String data = res.data['edit_image_url'];
+    debugPrint(data);
+    return data.toString();
+  }
   void saveImage() async {
     await GallerySaver.saveImage(widget.image.path,
         toDcim: true, albumName: 'Flutter');
@@ -70,7 +92,7 @@ class _PageToEditState extends State<PageToEdit> {
                   child: SizedBox(
                     height: 390,
                     width: 270,
-                    child: Image.file(File(widget.image.path)),
+                    child: result == 'Resim Yok' ? Image.file(File(widget.image.path)) : Image.network(result, fit: BoxFit.contain, key: Key(cakallik.toString()),),
                   ),
                 ),
                 Positioned(
@@ -86,10 +108,6 @@ class _PageToEditState extends State<PageToEdit> {
             Container(
               decoration: const BoxDecoration(
                 color: Color.fromARGB(255, 81, 81, 81),
-                // gradient: LinearGradient(
-                //   colors: [
-                //   ]
-                // ),
               ),
               child: SizedBox(
                 width: double.infinity,
@@ -98,8 +116,15 @@ class _PageToEditState extends State<PageToEdit> {
                   scrollDirection: Axis.horizontal,
                   children: [
                     InkWell(
-                      onTap: () {
-                        debugPrint('deneme');
+                      onTap: () async {
+                        /*******************************/
+                        String gecici_url = await goApi('applyPencilSketch');
+                        debugPrint('gecici :'+gecici_url);
+                        setState(() {
+                          result = gecici_url ;
+                          cakallik = cakallik+1;
+                        });
+                        /*******************************/
                       },
                       child: SizedBox(
                           width: 90,
@@ -110,6 +135,29 @@ class _PageToEditState extends State<PageToEdit> {
                               // SizedBox(child: Icon(Icons.add,color: Colors.red,)),
                               SizedBox(child: Icon(Icons.add)),
                               SizedBox(child: Text('deneme')),
+                            ],
+                          )),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        /*******************************/
+                        String gecici_url = await goApi('applyWarm');
+                        debugPrint('gecici :'+gecici_url);
+                        setState(() {
+                          result = gecici_url ;
+                          cakallik = cakallik+1;
+                        });
+                        /*******************************/
+                      },
+                      child: SizedBox(
+                          width: 90,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: const [
+                              // SizedBox(child: Icon(Icons.add,color: Colors.red,)),
+                              SizedBox(child: Icon(Icons.add)),
+                              SizedBox(child: Text('denemeWarm')),
                             ],
                           )),
                     ),
