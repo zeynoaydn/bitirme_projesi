@@ -16,9 +16,9 @@ class ImageController(Resource):
         file=request.files["dosya"]
         file.save(os.path.join("upload/",file.filename))
         path="upload/"+file.filename
-        if operation=='applyPencilSketch':
+        if operation=='applyPencilSketch': # çalışıyor
             applyPencilSketch(path, token)
-        elif operation=='convert_to_image_gray':
+        elif operation=='convert_to_image_gray': 
             convert_to_image_gray(path, token)
         elif operation=='applyPencilSketch2':
             applyPencilSketch2(path, token)
@@ -26,8 +26,8 @@ class ImageController(Resource):
             applyGotham(path, token)
         elif operation=='applyWarm':
             applyWarm(path, token)
-        elif operation=='applyCold':
-            applyCold(path, token)
+        # elif operation=='applyCold':
+        #     applyCold(path, token)
         elif operation=='applyGrayscale':
             applyGrayscale(path, token)
         elif operation=='applySepia':
@@ -36,16 +36,12 @@ class ImageController(Resource):
             applySharpening(path, token)
         elif operation=='applySharpening2':
             applySharpening2(path, token)
-        elif operation=='applyDetailEnhancing':
-            applyDetailEnhancing(path, token)
         elif operation=='applyStylization':
             applyStylization(path, token)
         elif operation=='applyInvert':
             applyInvert(path, token)
         elif operation=='reverseReflection':
             reverseReflection(path, token)
-        elif operation=='resizedImg':
-            resizedImg(path, token)
         elif operation=='horizontalStack':
             horizontalStack(path, token)
         elif operation=='verticalStack':

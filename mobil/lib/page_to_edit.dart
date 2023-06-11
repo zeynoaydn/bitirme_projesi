@@ -19,12 +19,16 @@ class PageToEdit extends StatefulWidget {
 class _PageToEditState extends State<PageToEdit> {
   bool loading = false;
   String result = 'Resim Yok';
-  bool loading_umut = false;
-  int cakallik = 0;
+  int my_key = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (result!='Resim Yok') {
+      result = 'Resim Yok';
+    }
+  }
 
   Future<String> goApi(String operation) async {
-    
-    debugPrint('operation : '+operation);
     
     var dio = Dio();
     var res = null;
@@ -35,10 +39,16 @@ class _PageToEditState extends State<PageToEdit> {
       "dosya": await MultipartFile.fromFile(resim.path),
     });
 
-    res = await dio.post('http://10.0.2.2:5000/ImageEdit/'+operation, data:formData);
-    String data = res.data['edit_image_url'];
-    debugPrint(data);
-    return data.toString();
+    try {
+      res = await dio.post('http://10.0.2.2:5000/ImageEdit/'+operation, data:formData);
+      String data = res.data['edit_image_url'];
+      debugPrint('Gelen Data:'+data);
+      return data.toString();
+    } catch (e) {
+      debugPrint('Tıkandı');
+      return 'Resim yok';
+    }
+
   }
   
   
@@ -67,17 +77,6 @@ class _PageToEditState extends State<PageToEdit> {
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 81, 81, 81),
           elevation: 2,
-          actions: [
-            InkWell(
-              child: button(),
-              onTap: () async {
-                setState(() {
-                  loading = true;
-                });
-                saveImage();
-              },
-            ),
-          ],
         ),
         body: 
         Column(
@@ -94,7 +93,7 @@ class _PageToEditState extends State<PageToEdit> {
                   child: SizedBox(
                     height: 390,
                     width: 270,
-                    child: result == 'Resim Yok' ? Image.file(File(widget.image.path)) : Image.network(result, fit: BoxFit.contain, key: Key(cakallik.toString()),),
+                    child: myImage(result, my_key),
                   ),
                 ),
                 Positioned(
@@ -107,7 +106,8 @@ class _PageToEditState extends State<PageToEdit> {
                             height: 1,
                           ))
               ]),
-            Container(
+            result == 'Resim Yok' ? Container
+            (
               decoration: const BoxDecoration(
                 color: Color.fromARGB(255, 81, 81, 81),
               ),
@@ -117,58 +117,60 @@ class _PageToEditState extends State<PageToEdit> {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    InkWell(
-                      onTap: () async {
-                        /*******************************/
-                        String gecici_url = await goApi('applyPencilSketch');
-                        debugPrint('gecici :'+gecici_url);
-                        setState(() {
-                          result = gecici_url ;
-                          cakallik = cakallik+1;
-                        });
-                        /*******************************/
-                      },
-                      child: SizedBox(
-                          width: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              // SizedBox(child: Icon(Icons.add,color: Colors.red,)),
-                              SizedBox(child: Icon(Icons.add)),
-                              SizedBox(child: Text('deneme')),
-                            ],
-                          )),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        /*******************************/
-                        String gecici_url = await goApi('applyWarm');
-                        debugPrint('gecici :'+gecici_url);
-                        setState(() {
-                          result = gecici_url ;
-                          cakallik = cakallik+1;
-                        });
-                        /*******************************/
-                      },
-                      child: SizedBox(
-                          width: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              // SizedBox(child: Icon(Icons.add,color: Colors.red,)),
-                              SizedBox(child: Icon(Icons.add)),
-                              SizedBox(child: Text('denemeWarm')),
-                            ],
-                          )),
-                    ),
+                    myFilter('applyPencilSketch', 'Apply Pencil Sketch'),
+                    myFilter('convert_to_image_gray', 'To Gray'),
+                    myFilter('applyPencilSketch2', 'applyPencilSketch2'),
+                    myFilter('applyGotham', 'applyGotham'),
+                    myFilter('applyWarm', 'applyWarm'),
+                    myFilter('applyGrayscale', 'applyGrayscale'),
+                    myFilter('applySepia', 'applySepia'),
+                    myFilter('applySharpening', 'applySharpening'),
+                    myFilter('applySharpening2', 'applySharpening2'),
+                    myFilter('applyStylization', 'applyStylization'),
+                    myFilter('applyInvert', 'applyInvert'),
+                    myFilter('reverseReflection', 'reverseReflection'),
+                    myFilter('horizontalStack', 'horizontalStack'),
+                    myFilter('verticalStack', 'verticalStack'),
                   ],
                 ),
               ),
-            )
+            ) :
+            InkWell(
+              child: button(),
+              onTap: () async {
+                setState(() {
+                  loading = true;
+                });
+                saveImage();
+              },
+            ),
           ],
         ));
+  }
+
+  InkWell myFilter(String operation, String view){
+    return InkWell(
+                      onTap: () async {
+                        String gecici_url = await goApi(operation);
+                        debugPrint('gecici :'+gecici_url);
+                        setState(() {
+                          debugPrint('@@@@@@@@@@state@@@@@@@@@@');
+                          result = gecici_url ;
+                          my_key = my_key+1;
+                        });
+                      },
+                      child: SizedBox(
+                          width: 90,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children:  [
+                              // SizedBox(child: Icon(Icons.add,color: Colors.red,)),
+                              SizedBox(child: Icon(Icons.add)),
+                              SizedBox(child: Text(view)),
+                            ],
+                          )),
+                    );
   }
 
   Container loadingMethod() {
@@ -253,5 +255,15 @@ class _PageToEditState extends State<PageToEdit> {
         ),
       ],
     );
+  }
+  
+  Image myImage(String result, int key) {
+    if (result == 'Resim Yok') {
+      return Image.file(File(widget.image.path));
+    }
+    return Image.network(result, fit: BoxFit.contain, key: Key(key.toString()), errorBuilder: (context, error, stackTrace) {
+      debugPrint('umutumutumutumut');
+      return Image.network(result, fit: BoxFit.contain, key: Key(key.toString()));
+    },);
   }
 }
