@@ -13,11 +13,9 @@ class ImageController(Resource):
     def post(self,operation):
         alphabet = string.ascii_letters + string.digits
         token = ''.join(random.choice(alphabet) for _ in range(10))
-
         file=request.files["dosya"]
         file.save(os.path.join("upload/",file.filename))
         path="upload/"+file.filename
-
         if operation=='applyPencilSketch':
             applyPencilSketch(path, token)
         elif operation=='convert_to_image_gray':

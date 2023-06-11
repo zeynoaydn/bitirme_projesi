@@ -40,6 +40,8 @@ class _PageToEditState extends State<PageToEdit> {
     debugPrint(data);
     return data.toString();
   }
+  
+  
   void saveImage() async {
     await GallerySaver.saveImage(widget.image.path,
         toDcim: true, albumName: 'Flutter');

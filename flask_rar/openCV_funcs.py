@@ -4,10 +4,13 @@ from scipy.interpolate import UnivariateSpline
 import numpy as np
 
 def rename_image(file_path, new_name):
-    directory = os.path.dirname(file_path)
-    new_path = os.path.join(directory, new_name)
-    os.rename(file_path, new_path)
+    file_path = 'upload/'+file_path
 
+    directory = os.path.dirname(file_path)
+
+    new_path = os.path.join(directory, new_name)
+
+    os.rename(file_path, new_path)
 
 def rescale(image, image_path, token):
     name = os.path.basename(image_path)
@@ -21,10 +24,12 @@ def convert_to_image_gray(image_path, token):
     gray_image=rescale(cv2.imread(image_path,0), image_path, token)
     name=image_path.split("/")[-1]
     cv2.imwrite(name,gray_image)
-    os.remove(image_path)
 
 def applyPencilSketch(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
+    print('*'*100)
+
+    print('*'*100)
     if image is None:
         print("Error: Failed to read image file")
         return None
@@ -38,11 +43,12 @@ def applyPencilSketch(image_path, token, display=True):
 
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, color_sketch)
+        cv2.imwrite(token+name, color_sketch)
+
     else:
         return color_sketch
-    
-def applyPencilSketch2(image_path, display=True):
+
+def applyPencilSketch2(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
 
     if image is None:
@@ -58,12 +64,11 @@ def applyPencilSketch2(image_path, display=True):
 
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, gray_sketch)
-        os.remove(image_path)
+        cv2.imwrite(token+name, gray_sketch)
     else:
         return gray_sketch
-    
-def applyGotham(image_path, display=True):
+
+def applyGotham(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     midtone_contrast_increase = UnivariateSpline(x=[0, 25, 51, 76, 102, 128, 153, 178, 204, 229, 255],
                                                  y=[0, 13, 25, 51, 76, 128, 178, 204, 229, 242, 255])(range(256))
@@ -83,59 +88,55 @@ def applyGotham(image_path, display=True):
 
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applyWarm(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     blue_channel, green_channel, red_channel = cv2.split(image)
-    
+
     increase_table = np.array([i+50 if i+50 < 255 else 255 for i in np.arange(0, 256)]).astype("uint8")
     decrease_table = np.array([i-30 if i-30 > 0 else 0 for i in np.arange(0, 256)]).astype("uint8")
-    
+
     red_channel = cv2.LUT(red_channel, increase_table)
     blue_channel = cv2.LUT(blue_channel, decrease_table)
-    
+
     output_image = cv2.merge((blue_channel, green_channel, red_channel))
-    
+
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applyCold(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     blue_channel, green_channel, red_channel = cv2.split(image)
-    
+
     increase_table = np.array([i+15 if i+15<255 else 255 for i in np.arange(0,256)]).astype("uint8")
     decrease_table = np.array([i-15 if i-15>0 else 0 for i in np.arange(0,256)]).astype("uint8")
-    
+
     red_channel = cv2.LUT(red_channel, decrease_table).astype(np.uint8)
     blue_channel = cv2.LUT(blue_channel, increase_table).astype(np.uint8)
     output_image = cv2.merge((blue_channel, green_channel, red_channel))
-    
+
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applyGrayscale(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     output_image = cv2.merge((gray, gray, gray))
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applySepia(image_path, token, display=True,):
     image = rescale(cv2.imread(image_path), image_path, token)
     image_float = np.float64(image)
@@ -152,104 +153,94 @@ def applySepia(image_path, token, display=True,):
 
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applySharpening(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
-    
+
     sharpening_kernel = np.array([[-1, -1, -1],
                                   [-1, 9.2, -1],
-                                  [-1, -1, -1]]) 
-    
+                                  [-1, -1, -1]])
+
     sharpened_image = cv2.filter2D(image, -1, sharpening_kernel)
-    
+
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, sharpened_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, sharpened_image)
     else:
         return sharpened_image
-    
+
 def applySharpening2(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
-    
+
     sharpening_kernel = np.array([[-1, -1, -1],
                                   [-1, 9.4, -1],
                                   [-1, -1, -1]])  / 9.0
-    
+
     sharpened_image = cv2.filter2D(image, -1, sharpening_kernel)
-    
+
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, sharpened_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, sharpened_image)
     else:
         return sharpened_image
-    
+
 def applyDetailEnhancing(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     output_image = cv2.detailEnhance(image, sigma_s=15, sigma_r=0.15)
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def applyStylization(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
-    output_image = cv2.stylization(image, sigma_s=15, sigma_r=0.55) 
+    output_image = cv2.stylization(image, sigma_s=15, sigma_r=0.55)
     if display:
         name = os.path.basename(image_path)
         cv2.imwrite(name, output_image)
-        os.remove(image_path)
     else:
         return output_image
-    
+
 def applyInvert(image_path, token, display=True):
     image = rescale(cv2.imread(image_path), image_path, token)
     output_image = cv2.bitwise_not(image)
     if display:
         name = os.path.basename(image_path)
-        cv2.imwrite(name, output_image)
-        os.remove(image_path)
+        cv2.imwrite(token+name, output_image)
     else:
         return output_image
-    
+
 def reverseReflection(image_path, token, display=True):
     dog = rescale(cv2.imread(image_path), image_path, token)
-    
-    
+
+
     if display:
         reverse_flip = np.fliplr(dog)
         name = os.path.basename(image_path)
-        cv2.imwrite(name, reverse_flip)
-        os.remove(image_path)
+        cv2.imwrite(token+name, reverse_flip)
     return reverse_flip
 
 def resizedImg(image_path, token, display=True):
     image=rescale(cv2.imread(image_path), image_path)
     img_resize=cv2.resize(image,(150,150))
-    
+
     name = os.path.basename(image_path)
-    cv2.imwrite(name, img_resize)
-    os.remove(image_path)
+    cv2.imwrite(token+name, img_resize)
 
 def horizontalStack(image_path, token, display=True):
     img=rescale(cv2.imread(image_path), image_path)
     hor=np.hstack((img,img))
-    
+
     name = os.path.basename(image_path)
-    cv2.imwrite(name, hor)
-    os.remove(image_path)
+    cv2.imwrite(token+name, hor)
 
 def verticalStack(image_path, token, display=True):
     img=rescale(cv2.imread(image_path), image_path)
     ver=np.vstack((img,img))
 
     name = os.path.basename(image_path)
-    cv2.imwrite(name, ver)
-    os.remove(image_path)
+    cv2.imwrite(token+name, ver)
