@@ -5,5 +5,5 @@
 
 ## Video
 <div align="center">
-   <a href="https://github.com/zeynoaydn/VrBalloonGame/issues/1#issue-2132913084">Buraya Tıklayınız</a>
+   <a href="https://github.com/zeynoaydn/bitirme_projesi/issues/1#issue-2147498668">Buraya Tıklayınız</a>
 </div>
